@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>初學者三大學習主題導航中心 | AI · 英文 · CAD 繪圖</title>
+    <!-- 載入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 載入 Google Fonts (Noto Sans TC & Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- 載入 Phosphor Icons 圖示庫 -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter"', '"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            ai: '#6366f1',      // Indigo
+                            eng: '#0ea5e9',     // Sky
+                            cad: '#f59e0b',     // Amber
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 自訂平滑滾動與微動畫 */
+        html {
+            scroll-behavior: smooth;
+        }
+        .tab-active-all { background-color: #1e293b; color: white; }
+        .tab-active-ai { background-color: #4f46e5; color: white; }
+        .tab-active-eng { background-color: #0284c7; color: white; }
+        .tab-active-cad { background-color: #d97706; color: white; }
+        
+        /* 隱藏捲軸但保留滾動功能 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-indigo-100 selection:text-indigo-800">
+
+    <!-- 頂部導航列 -->
+    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-sky-500 to-amber-500 flex items-center justify-center text-white shadow-sm">
+                    <i class="ph-bold ph-compass text-xl"></i>
+                </div>
+                <span class="font-bold text-lg tracking-tight text-slate-900">新手自學導航站</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="openChecklistModal()" class="inline-flex items-center gap-1.5 text-sm font-medium px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                    <i class="ph-bold ph-check-square-offset text-indigo-600"></i>
+                    <span class="hidden sm:inline">我的學習清單</span>
+                    <span id="saved-count" class="bg-indigo-600 text-white text-xs px-1.5 py-0.5 rounded-full">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero 橫幅區塊 -->
+    <section class="relative overflow-hidden bg-white border-b border-slate-200 pt-12 pb-14 sm:pt-16 sm:pb-20">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 mb-4">
+                <i class="ph-fill ph-sparkle"></i> 專為零基礎初學者精選的免費與入門資源
+            </span>
+            <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-5">
+                開啟你的三大核心技能：<br class="hidden sm:inline">
+                <span class="text-indigo-600">AI 應用</span>、<span class="text-sky-600">實用英文</span> 與 <span class="text-amber-600">CAD 繪圖</span>
+            </h1>
+            <p class="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 mb-8 leading-relaxed">
+                不知道從哪裡開始嗎？我們從網路上精選了最適合新手的免費自學網站、工具與 30 天入門學習路線，不需花大錢也能踏出第一步！
+            </p>
+
+            <!-- 主題快速篩選膠囊按鈕 -->
+            <div class="flex flex-wrap justify-center gap-2.5 sm:gap-3" id="category-tabs">
+                <button onclick="filterCategory('all')" data-cat="all" class="cat-btn tab-active-all px-5 py-2.5 rounded-xl font-medium text-sm transition shadow-sm flex items-center gap-2">
+                    <i class="ph-bold ph-squares-four"></i> 全部主題
+                </button>
+                <button onclick="filterCategory('ai')" data-cat="ai" class="cat-btn bg-white border border-slate-200 hover:border-indigo-300 text-slate-700 px-5 py-2.5 rounded-xl font-medium text-sm transition shadow-sm flex items-center gap-2">
+                    <i class="ph-bold ph-robot text-indigo-600"></i> AI 人工智慧學習
+                </button>
+                <button onclick="filterCategory('eng')" data-cat="eng" class="cat-btn bg-white border border-slate-200 hover:border-sky-300 text-slate-700 px-5 py-2.5 rounded-xl font-medium text-sm transition shadow-sm flex items-center gap-2">
+                    <i class="ph-bold ph-translate text-sky-600"></i> 英文零基礎學習
+                </button>
+                <button onclick="filterCategory('cad')" data-cat="cad" class="cat-btn bg-white border border-slate-200 hover:border-amber-300 text-slate-700 px-5 py-2.5 rounded-xl font-medium text-sm transition shadow-sm flex items-center gap-2">
+                    <i class="ph-bold ph-cube text-amber-600"></i> CAD 2D/3D 繪圖
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 主要內容區塊 -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+        <!-- 區塊一：新手入門路線圖 (可切換主題) -->
+        <section class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+                        <i class="ph-duotone ph-map-trifold text-indigo-600 text-2xl"></i>
+                        初學者「四步驟」無痛入門路線
+                    </h2>
+                    <p class="text-sm text-slate-500 mt-1">點選下方頁籤，查看各領域的推薦學習順序</p>
+                </div>
+                <div class="flex bg-slate-100 p-1 rounded-xl self-start sm:self-auto">
+                    <button onclick="switchRoadmap('ai')" id="rm-btn-ai" class="rm-tab px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-white text-indigo-600 shadow-sm transition">AI 學習</button>
+                    <button onclick="switchRoadmap('eng')" id="rm-btn-eng" class="rm-tab px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition">英文學習</button>
+                    <button onclick="switchRoadmap('cad')" id="rm-btn-cad" class="rm-tab px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition">CAD 繪圖</button>
+                </div>
+            </div>
+
+            <!-- 路線圖步驟容器 -->
+            <div id="roadmap-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- 由 JS 動態渲染 -->
+            </div>
+        </section>
+
+        <!-- 區塊二：精選免費學習資源庫 -->
+        <section>
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">精選初學者免費學習網站與工具</h2>
+                    <p class="text-sm text-slate-500 mt-1">點擊卡片右上角的「+ 加入清單」可收藏您想先體驗的平台</p>
+                </div>
+                <!-- 搜尋框 -->
+                <div class="relative w-full sm:w-64">
+                    <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="search-input" onkeyup="handleSearch()" placeholder="搜尋關鍵字 (如: 免費、3D、口說)..." class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                </div>
+            </div>
+
+            <!-- 資源卡片網格 -->
+            <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 由 JS 動態渲染 -->
+            </div>
+
+            <!-- 無搜尋結果提示 -->
+            <div id="empty-state" class="hidden text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300">
+                <i class="ph-duotone ph-magnifying-glass text-4xl text-slate-400 mb-2"></i>
+                <p class="text-slate-600 font-medium">找不到符合條件的學習資源</p>
+                <button onclick="resetFilters()" class="mt-3 text-sm text-indigo-600 font-semibold hover:underline">重設篩選條件</button>
+            </div>
+        </section>
+
+        <!-- 區塊三：給初學者的三個避坑小叮嚀 -->
+        <section class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 sm:p-10 text-white shadow-lg">
+            <h2 class="text-xl sm:text-2xl font-bold mb-6 flex items-center gap-2">
+                <i class="ph-fill ph-lightbulb text-amber-400 text-2xl"></i>
+                給初學者的自學心法：避免半途而廢
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
+                    <div class="text-indigo-300 font-bold text-sm mb-1">AI 學習心法</div>
+                    <h3 class="font-bold text-lg mb-2">先求「用起來」，別急著寫程式</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">新手常誤以為學 AI 要先學 Python。其實先學會用 ChatGPT、Gemini 或 NotebookLM 整理資料、寫信與腦力激盪，就能解決 80% 日常需求。</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
+                    <div class="text-sky-300 font-bold text-sm mb-1">英文學習心法</div>
+                    <h3 class="font-bold text-lg mb-2">每天 10 分鐘勝過週末苦讀 3 小時</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">利用 Duolingo 遊戲化闖關或看 VoiceTube 短片建立語感，選擇「聽得懂 70%」的內容，才不會因為挫折感太重而放棄。</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
+                    <div class="text-amber-300 font-bold text-sm mb-1">CAD 繪圖心法</div>
+                    <h3 class="font-bold text-lg mb-2">從日常小物件開始臨摹</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">不要一開始就挑戰複雜機械！先用免費的 TinkerCAD 或 LibreCAD 練習畫出「馬克杯、手機架或房間平面圖」，熟悉座標與尺寸概念。</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-white border-t border-slate-200 mt-16 py-8">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+            <p>© 2026 初學者三大學習主題導航中心 · 彙整網路精選免費學習資源</p>
+            <p>祝您自學順利，每天進步一點點！</p>
+        </div>
+    </footer>
+
+    <!-- 收藏清單 Modal (替代 alert) -->
+    <div id="checklist-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="ph-fill ph-bookmark-simple text-indigo-600"></i>
+                    我的初學者學習清單
+                </h3>
+                <button onclick="closeChecklistModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+            <div id="saved-list-content" class="py-4 max-h-80 overflow-y-auto space-y-2.5">
+                <!-- 動態渲染收藏項目 -->
+            </div>
+            <div class="pt-4 border-t border-slate-100 flex justify-between items-center">
+                <button onclick="clearSavedList()" class="text-xs text-slate-400 hover:text-rose-600 transition">清空清單</button>
+                <button onclick="closeChecklistModal()" class="px-5 py-2 bg-slate-900 text-white text-sm font-medium rounded-xl hover:bg-slate-800 transition">完成</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示訊息 Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-lg text-sm flex items-center gap-2">
+        <i class="ph-fill ph-check-circle text-emerald-400 text-lg"></i>
+        <span id="toast-msg">已加入學習清單</span>
+    </div>
+
+    <!-- JavaScript 邏輯 -->
+    <script>
+        // 1. 路線圖資料
+        const roadmapData = {
+            ai: [
+                { step: "第 1 週", title: "建立 AI 基礎觀念", desc: "了解生成式 AI 的原理與限制（如 AI 幻覺），註冊並熟悉 ChatGPT、Gemini 或 Claude 介面。" },
+                { step: "第 2 週", title: "學會提示詞 (Prompt)", desc: "掌握「角色設定 + 任務目標 + 輸出格式」公式，讓 AI 精準回答你的問題。" },
+                { step: "第 3 週", title: "搭配資料整理工具", desc: "嘗試 Google NotebookLM，上傳 PDF 或網頁讓 AI 幫你做筆記、生成摘要與語音導讀。" },
+                { step: "第 4 週", title: "打造個人工作流", desc: "將 AI 融入日常：練習用 AI 潤飾英文信件、規劃旅遊行程或協助整理會議重點。" }
+            ],
+            eng: [
+                { step: "第 1 週", title: "無痛啟動語感", desc: "每天花 10 分鐘使用 Duolingo 闖關，找回對字母、發音與基礎單字的熟悉度。" },
+                { step: "第 2 週", title: "看懂分級短文", desc: "閱讀 News in Levels 的 Level 1 每日新聞，累積最實用的高頻基礎單字。" },
+                { step: "第 3 週", title: "雙語影片練聽力", desc: "透過 VoiceTube 或 Cool English 觀看有中英字幕的短片，練習跟讀模仿語調。" },
+                { step: "第 4 週", title: "開口與生活應用", desc: "利用 AI 工具或 BBC Learning English 的日常對話腳本，每天大聲朗讀 5 句生活會話。" }
+            ],
+            cad: [
+                { step: "第 1 週", title: "認識空間與介面", desc: "免安裝軟體！先打開網頁版 TinkerCAD，熟悉 3D 視角旋轉、縮放與基本幾何體堆疊。" },
+                { step: "第 2 週", title: "2D 平面繪圖基礎", desc: "下載免費開源的 LibreCAD，學習畫直線、圓形、修剪 (Trim) 與尺寸標註概念。" },
+                { step: "第 3 週", title: "草圖拉伸變 3D", desc: "進階體驗 FreeCAD 或 Onshape，學習「先畫 2D 平面草圖，再拉伸成長方體」的參數化邏輯。" },
+                { step: "第 4 週", title: "完成第一個作品", desc: "試著畫出一個客製化鑰匙圈、手機支架或簡單的室內平面配置圖，匯出 STL/DXF 檔。" }
+            ]
+        };
+
+        // 2. 網路精選初學者資源資料
+        const learningResources = [
+            // AI 學習
+            {
+                id: "ai-1",
+                category: "ai",
+                categoryName: "AI 學習",
+                title: "Google Skills & AI Essentials",
+                tag: "官方免費資源",
+                cost: "免費入門課程",
+                desc: "Google 官方推出的 AI 學習中心，涵蓋 Gemini 應用、NotebookLM 筆記術與基礎生成式 AI 觀念，非常適合非技術背景新手。",
+                url: "https://grow.google/ai/",
+                highlights: ["零程式基礎可學", "涵蓋 NotebookLM 教學"]
+            },
+            {
+                id: "ai-2",
+                category: "ai",
+                categoryName: "AI 學習",
+                title: "Learn Prompting (提示詞指南)",
+                tag: "跨平台通用",
+                cost: "核心教材完全免費",
+                desc: "專為初學者設計的提示詞工程開源指南，教你如何與 ChatGPT、Claude、Gemini 有效溝通，避免獲得空泛的回答。",
+                url: "https://learnprompting.org/",
+                highlights: ["圖解豐富易懂", "實用指令範例多"]
+            },
+            {
+                id: "ai-3",
+                category: "ai",
+                categoryName: "AI 學習",
+                title: "OpenAI Academy / 官方指南",
+                tag: "官方入門",
+                cost: "免費公開資源",
+                desc: "OpenAI 官方整理的提示設計與工作流程教學，帶領新手從最基本的對話技巧一路學到日常辦公自動化。",
+                url: "https://academy.openai.com/",
+                highlights: ["官方第一手教學", "貼近職場與生活應用"]
+            },
+            {
+                id: "ai-4",
+                category: "ai",
+                categoryName: "AI 學習",
+                title: "Google Quick, Draw! (AI 猜畫)",
+                tag: "趣味互動",
+                cost: "完全免費",
+                desc: "透過塗鴉讓神經網路猜測你畫的是什麼，在 1 分鐘的小遊戲中直覺理解「機器學習」與圖像辨識的運作原理。",
+                url: "https://quickdraw.withgoogle.com/",
+                highlights: ["免註冊即玩", "秒懂 AI 辨識原理"]
+            },
+
+            // 英文學習
+            {
+                id: "eng-1",
+                category: "eng",
+                categoryName: "英文學習",
+                title: "Cool English 酷英網",
+                tag: "台灣教育部建置",
+                cost: "完全免費",
+                desc: "由臺師大團隊建置的優質免費平台，從零基礎發音、字彙遊戲到互動式聽說讀寫練習一應俱全，介面親切無壓力。",
+                url: "https://www.coolenglish.edu.tw/",
+                highlights: ["全繁體中文介面", "遊戲化互動無痛學習"]
+            },
+            {
+                id: "eng-2",
+                category: "eng",
+                categoryName: "英文學習",
+                title: "VoiceTube 看影片學英文",
+                tag: "影音雙語字幕",
+                cost: "基本功能免費",
+                desc: "精選數萬部 YouTube 影片，提供中英雙語字幕、單句重複播放與即時單字查詢，適合想從生活情境練聽力的新手。",
+                url: "https://tw.voicetube.com/",
+                highlights: ["依程度分級（初/中/高）", "可調整語速與單句循環"]
+            },
+            {
+                id: "eng-3",
+                category: "eng",
+                categoryName: "英文學習",
+                title: "News in Levels 分級新聞",
+                tag: "閱讀與聽力",
+                cost: "完全免費",
+                desc: "將同一則國際新聞改寫為 Level 1 到 Level 3 三種難度，並附有慢速朗讀音檔，讓初學者也能讀懂英文新聞。",
+                url: "https://www.newsinlevels.com/",
+                highlights: ["Level 1 僅用基礎千字", "每天一篇輕鬆累積字彙"]
+            },
+            {
+                id: "eng-4",
+                category: "eng",
+                categoryName: "英文學習",
+                title: "BBC Learning English",
+                tag: "經典權威",
+                cost: "完全免費",
+                desc: "英國廣播公司專為英語學習者設計的網站，提供 6 分鐘英語、發音教學與日常會話短劇，附帶完整文字稿與小測驗。",
+                url: "https://www.bbc.co.uk/learningenglish/",
+                highlights: ["道地英式發音教學", "單元短小精悍（3~6分鐘）"]
+            },
+
+            // CAD 繪圖學習
+            {
+                id: "cad-1",
+                category: "cad",
+                categoryName: "CAD 繪圖",
+                title: "TinkerCAD (Autodesk 出品)",
+                tag: "新手首選 3D",
+                cost: "完全免費 (瀏覽器免安裝)",
+                desc: "最適合零基礎初學者的 3D 建模平台！打開網頁就能用積木堆疊的概念設計 3D 模型，內建超詳細的互動式新手教學。",
+                url: "https://www.tinkercad.com/",
+                highlights: ["免下載安裝、支援中文", "內建手把手互動教學關卡"]
+            },
+            {
+                id: "cad-2",
+                category: "cad",
+                categoryName: "CAD 繪圖",
+                title: "LibreCAD (開源 2D 製圖)",
+                tag: "2D 工程平面圖",
+                cost: "完全免費開源",
+                desc: "輕量級的 2D CAD 繪圖軟體，介面乾淨不複雜，支援讀取與匯出 DXF/DWG 格式，適合用來練習室內平面圖與基礎機械製圖。",
+                url: "https://librecad.org/",
+                highlights: ["支援 Windows/Mac/Linux", "檔案小巧、操作直覺"]
+            },
+            {
+                id: "cad-3",
+                category: "cad",
+                categoryName: "CAD 繪圖",
+                title: "Onshape Free (雲端參數化 CAD)",
+                tag: "進階工業設計",
+                cost: "個人免費版",
+                desc: "由前 SolidWorks 團隊打造的雲端專業 CAD 軟體，不需高階顯卡、在瀏覽器就能畫出精密 3D 零件，官方提供免費學習中心。",
+                url: "https://www.onshape.com/en/products/free",
+                highlights: ["無需高規格電腦", "擁有完整的官方自學課程"]
+            },
+            {
+                id: "cad-4",
+                category: "cad",
+                categoryName: "CAD 繪圖",
+                title: "FreeCAD (開源 3D 參數化建模)",
+                tag: "全功能開源",
+                cost: "完全免費開源",
+                desc: "功能強大的免費 3D 建模軟體，透過修改歷史尺寸就能自動更新模型，適合想深入學習產品設計與 3D 列印的自學者。",
+                url: "https://www.freecad.org/",
+                highlights: ["無試用期限制、永久免費", "支援多種工業標準檔案格式"]
+            }
+        ];
+
+        // 狀態管理
+        let currentCategory = 'all';
+        let savedIds = JSON.parse(localStorage.getItem('beginner_saved_resources') || '[]');
+
+        // 初始化頁面
+        document.addEventListener('DOMContentLoaded', () => {
+            switchRoadmap('ai');
+            renderResources();
+            updateSavedCount();
+        });
+
+        // 切換路線圖
+        function switchRoadmap(cat) {
+            // 更新頁籤樣式
+            document.querySelectorAll('.rm-tab').forEach(btn => {
+                btn.className = "rm-tab px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition";
+            });
+            const activeBtn = document.getElementById(`rm-btn-${cat}`);
+            const colorMap = { ai: 'text-indigo-600', eng: 'text-sky-600', cad: 'text-amber-600' };
+            activeBtn.className = `rm-tab px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-white ${colorMap[cat]} shadow-sm transition`;
+
+            // 渲染步驟卡片
+            const container = document.getElementById('roadmap-container');
+            const badgeBg = { ai: 'bg-indigo-50 text-indigo-700', eng: 'bg-sky-50 text-sky-700', cad: 'bg-amber-50 text-amber-700' };
+            
+            container.innerHTML = roadmapData[cat].map((item, idx) => `
+                <div class="relative p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-lg ${badgeBg[cat]}">${item.step}</span>
+                            <span class="text-xs font-bold text-slate-300">0${idx + 1}</span>
+                        </div>
+                        <h3 class="font-bold text-slate-900 mb-1.5">${item.title}</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">${item.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 篩選主分類
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                const btnCat = btn.getAttribute('data-cat');
+                btn.className = "cat-btn bg-white border border-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-medium text-sm transition shadow-sm flex items-center gap-2 hover:bg-slate-50";
+                if (btnCat === cat) {
+                    btn.className = `cat-btn tab-active-${cat} px-5 py-2.5 rounded-xl font-medium text-sm transition shadow-sm flex items-center gap-2`;
+                    // 讓 active 狀態下的 icon 變白色
+                    const icon = btn.querySelector('i');
+                    if (icon) icon.classList.remove('text-indigo-600', 'text-sky-600', 'text-amber-600');
+                } else {
+                    // 恢復非 active 狀態的 icon 顏色
+                    const icon = btn.querySelector('i');
+                    if (icon) {
+                        if (btnCat === 'ai') icon.classList.add('text-indigo-600');
+                        if (btnCat === 'eng') icon.classList.add('text-sky-600');
+                        if (btnCat === 'cad') icon.classList.add('text-amber-600');
+                    }
+                }
+            });
+
+            // 若選擇特定分類，同步切換上方的路線圖方便對照
+            if (cat !== 'all') {
+                switchRoadmap(cat);
+            }
+
+            renderResources();
+        }
+
+        // 搜尋處理
+        function handleSearch() {
+            renderResources();
+        }
+
+        // 重設篩選
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            filterCategory('all');
+        }
+
+        // 渲染資源卡片
+        function renderResources() {
+            const keyword = document.getElementById('search-input').value.trim().toLowerCase();
+            const grid = document.getElementById('resources-grid');
+            const emptyState = document.getElementById('empty-state');
+
+            const filtered = learningResources.filter(item => {
+                const matchCat = currentCategory === 'all' || item.category === currentCategory;
+                const matchKw = !keyword || 
+                    item.title.toLowerCase().includes(keyword) || 
+                    item.desc.toLowerCase().includes(keyword) ||
+                    item.tag.toLowerCase().includes(keyword) ||
+                    item.highlights.some(h => h.toLowerCase().includes(keyword));
+                return matchCat && matchKw;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            const styleMap = {
+                ai: { badge: 'bg-indigo-50 text-indigo-700 border-indigo-100', btn: 'text-indigo-600 hover:bg-indigo-50' },
+                eng: { badge: 'bg-sky-50 text-sky-700 border-sky-100', btn: 'text-sky-600 hover:bg-sky-50' },
+                cad: { badge: 'bg-amber-50 text-amber-700 border-amber-100', btn: 'text-amber-600 hover:bg-amber-50' }
+            };
+
+            grid.innerHTML = filtered.map(item => {
+                const isSaved = savedIds.includes(item.id);
+                const theme = styleMap[item.category];
+                return `
+                <article class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-lg border ${theme.badge}">
+                                ${item.categoryName} · ${item.tag}
+                            </span>
+                            <button onclick="toggleSave('${item.id}')" class="text-xs font-medium px-2.5 py-1 rounded-lg border transition flex items-center gap-1 ${isSaved ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}">
+                                <i class="${isSaved ? 'ph-fill ph-check' : 'ph-bold ph-plus'}"></i>
+                                ${isSaved ? '已收藏' : '加入清單'}
+                            </button>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1.5">${item.title}</h3>
+                        <div class="text-xs font-medium text-emerald-600 mb-3 flex items-center gap-1">
+                            <i class="ph-fill ph-tag"></i> ${item.cost}
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                            ${item.desc}
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="flex flex-wrap gap-1.5 mb-4">
+                            ${item.highlights.map(h => `<span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md">✓ ${h}</span>`).join('')}
+                        </div>
+                        <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-slate-200 font-semibold text-sm ${theme.btn} transition">
+                            前往官方網站開始學習 <i class="ph-bold ph-arrow-up-right"></i>
+                        </a>
+                    </div>
+                </article>
+                `;
+            }).join('');
+        }
+
+        // 收藏功能
+        function toggleSave(id) {
+            const idx = savedIds.indexOf(id);
+            if (idx === -1) {
+                savedIds.push(id);
+                showToast('已加入我的學習清單！');
+            } else {
+                savedIds.splice(idx, 1);
+                showToast('已從學習清單移除');
+            }
+            localStorage.setItem('beginner_saved_resources', JSON.stringify(savedIds));
+            updateSavedCount();
+            renderResources();
+        }
+
+        function updateSavedCount() {
+            document.getElementById('saved-count').textContent = savedIds.length;
+        }
+
+        // Modal 控制
+        function openChecklistModal() {
+            const modal = document.getElementById('checklist-modal');
+            const content = document.getElementById('saved-list-content');
+            
+            if (savedIds.length === 0) {
+                content.innerHTML = `
+                    <div class="text-center py-8 text-slate-400">
+                        <i class="ph-duotone ph-folder-open text-4xl mb-2"></i>
+                        <p class="text-sm">目前還沒有收藏任何學習資源喔！<br>點擊卡片上的「+ 加入清單」來建立你的專屬課表。</p>
+                    </div>
+                `;
+            } else {
+                const items = learningResources.filter(r => savedIds.includes(r.id));
+                content.innerHTML = items.map(item => `
+                    <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200/70">
+                        <div>
+                            <span class="text-xs font-semibold text-indigo-600">${item.categoryName}</span>
+                            <h4 class="font-bold text-sm text-slate-900">${item.title}</h4>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">開啟</a>
+                            <button onclick="toggleSave('${item.id}'); openChecklistModal();" class="p-1.5 text-slate-400 hover:text-rose-600" title="移除">
+                                <i class="ph-bold ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeChecklistModal() {
+            const modal = document.getElementById('checklist-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function clearSavedList() {
+            savedIds = [];
+            localStorage.setItem('beginner_saved_resources', JSON.stringify(savedIds));
+            updateSavedCount();
+            renderResources();
+            openChecklistModal();
+        }
+
+        // Toast 提示框
+        let toastTimer;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2200);
+        }
+    </script>
+</body>
+</html>
